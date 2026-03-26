@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="app-shell">
+        <section class="surface balance-surface">
+            <div class="dashboard-topbar">
+                <div>
+                    <p class="mini-label">Overview</p>
+                    <h1>Bilance</h1>
+                </div>
+                <a class="top-link" href="{{ url_for('index') }}">Home</a>
+            </div>
+
+            <section class="balance-layout">
+                <article class="balance-card balance-card-large">
+                    <div>
+                        <span class="label-muted">Pašreizējā bilance</span>
+                        <strong>{{ "%.2f"|format(totals.bilance) }} EUR</strong>
+                    </div>
+                    <div class="ring-chart {% if totals.bilance >= 0 %}is-positive{% else %}is-negative{% endif %}">
+                        <span></span>
+                    </div>
+                </article>
+
+                <section class="quick-grid">
+                    <div class="quick-card quick-purple">
+                        <span>Ienākumi</span>
+                        <strong>{{ "%.2f"|format(totals.ienakumi) }}</strong>
+                    </div>
+                    <div class="quick-card quick-cyan">
+                        <span>Izdevumi</span>
+                        <strong>{{ "%.2f"|format(totals.izdevumi) }}</strong>
+                    </div>
+                    <div class="quick-card quick-light">
+                        <span>Ieraksti</span>
+                        <strong>{{ dati|length }}</strong>
+                    </div>
+                </section>
+            </section>
+
+            <section class="entry-list-panel">
+                <div class="panel-head">
+                    <h3>All Records</h3>
+                    <span class="panel-note">{{ dati|length }} items</span>
+                </div>
+
+                {% if dati %}
+                    <div class="compact-list">
+                        {% for ier in dati %}
+                            <div class="compact-item">
+                                <div>
+                                    <strong>{{ ier.apraksts }}</strong>
+                                    <p>{{ ier.datums }} • {{ ier.tips }} • {{ ier.konts }}</p>
+                                </div>
+                                <span class="{% if ier.tips == 'Ienākums' %}money-in{% else %}money-out{% endif %}">
+                                    {% if ier.tips == 'Ienākums' %}+{% else %}-{% endif %}{{ "%.2f"|format(ier.summa) }}
+                                </span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="empty-dark">Nav datu, ko attēlot bilances pārskatā.</p>
+                {% endif %}
+            </section>
+
+            <section class="entry-list-panel">
+                <div class="panel-head">
+                    <h3>Konti</h3>
+                    <span class="panel-note">Summary</span>
+                </div>
+                <div class="accounts-grid">
+                    {% for account in dashboard.account_totals %}
+                        <article class="account-card">
+                            <div class="account-top">
+                                <strong>{{ account.name }}</strong>
+                                <span class="{% if account.balance >= 0 %}money-in{% else %}money-out{% endif %}">
+                                    {{ "%.2f"|format(account.balance) }} EUR
+                                </span>
+                            </div>
+                            <div class="account-meta">
+                                <span>Ienākumi {{ "%.2f"|format(account.income) }} EUR</span>
+                                <span>Izdevumi {{ "%.2f"|format(account.expense) }} EUR</span>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            </section>
+        </section>
+    </main>
+</body>
+</html>
